@@ -1,0 +1,13 @@
+package org.example.helpdesk;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class HelpDeskAppApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(HelpDeskAppApplication.class, args);
+    }
+
+}
