@@ -27,6 +27,11 @@ public class TicketController {
         return ticketService.findById(id);
     }
 
+    @GetMapping("/{id}/response-time")
+    public int getResponseTime(@PathVariable Long id) {
+        return ticketService.getResponseTimeForTicket(id);
+    }
+
     @PostMapping
     public Ticket create(@RequestBody Ticket ticket) {
         return ticketService.create(ticket);

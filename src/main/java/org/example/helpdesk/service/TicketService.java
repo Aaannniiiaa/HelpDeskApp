@@ -1,5 +1,7 @@
 package org.example.helpdesk.service;
 
+import org.example.helpdesk.strategy.PriorityStrategy;
+import org.example.helpdesk.strategy.PriorityStrategyFactory;
 import org.example.helpdesk.entity.Ticket;
 import org.example.helpdesk.enums.TicketStatus;
 import org.example.helpdesk.repository.TicketRepository;
@@ -11,10 +13,12 @@ import java.util.List;
 @Service
 public class TicketService {
 
+    private final PriorityStrategyFactory priorityStrategyFactory;
     private final TicketRepository ticketRepository;
 
-    public TicketService(TicketRepository ticketRepository) {
+    public TicketService(TicketRepository ticketRepository, PriorityStrategyFactory priorityStrategyFactory) {
         this.ticketRepository = ticketRepository;
+        this.priorityStrategyFactory = priorityStrategyFactory;
     }
 
     public List<Ticket> findAll() {
@@ -54,5 +58,13 @@ public class TicketService {
 
     public void delete(Long id) {
         ticketRepository.deleteById(id);
+    }
+
+    public int getResponseTimeForTicket(Long id) {
+        Ticket ticket = findById(id);
+
+        PriorityStrategy strategy = priorityStrategyFactory.getStrategy(ticket.getPriority());
+
+        return strategy.getResponseTimeInHours();
     }
 }
