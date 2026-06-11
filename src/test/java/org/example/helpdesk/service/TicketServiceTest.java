@@ -11,7 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.example.helpdesk.entity.Category;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,5 +80,67 @@ class TicketServiceTest {
         int result = ticketService.getResponseTimeForTicket(1L);
 
         assertEquals(4, result);
+    }
+
+    @Test
+    void shouldFindAllTickets() {
+        Ticket ticket = new Ticket();
+        ticket.setId(1L);
+        ticket.setTitle("Login problem");
+
+        when(ticketRepository.findAll()).thenReturn(List.of(ticket));
+
+        List<Ticket> result = ticketService.findAll();
+
+        assertEquals(1, result.size());
+        assertEquals("Login problem", result.get(0).getTitle());
+    }
+
+    @Test
+    void shouldFindTicketById() {
+        Ticket ticket = new Ticket();
+        ticket.setId(1L);
+        ticket.setTitle("Login problem");
+
+        when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
+
+        Ticket result = ticketService.findById(1L);
+
+        assertEquals("Login problem", result.getTitle());
+    }
+
+    @Test
+    void shouldUpdateTicket() {
+        Ticket existingTicket = new Ticket();
+        existingTicket.setId(1L);
+        existingTicket.setTitle("Old title");
+        existingTicket.setDescription("Old description");
+        existingTicket.setPriority(TicketPriority.LOW);
+
+        Category category = new Category(1L, "Technical", "Technical problems");
+
+        Ticket updatedTicket = new Ticket();
+        updatedTicket.setTitle("New title");
+        updatedTicket.setDescription("New description");
+        updatedTicket.setPriority(TicketPriority.HIGH);
+        updatedTicket.setCategory(category);
+
+        when(ticketRepository.findById(1L)).thenReturn(Optional.of(existingTicket));
+        when(ticketRepository.save(existingTicket)).thenReturn(existingTicket);
+
+        Ticket result = ticketService.update(1L, updatedTicket);
+
+        assertEquals("New title", result.getTitle());
+        assertEquals("New description", result.getDescription());
+        assertEquals(TicketPriority.HIGH, result.getPriority());
+        assertEquals(category, result.getCategory());
+        verify(ticketRepository).save(existingTicket);
+    }
+
+    @Test
+    void shouldDeleteTicket() {
+        ticketService.delete(1L);
+
+        verify(ticketRepository).deleteById(1L);
     }
 }
