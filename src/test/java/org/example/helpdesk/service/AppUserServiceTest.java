@@ -59,6 +59,7 @@ class AppUserServiceTest {
         AppUser result = appUserService.create(user);
 
         assertEquals(1L, result.getId());
+        assertEquals("pass", result.getPassword());
         verify(appUserRepository).save(user);
     }
 

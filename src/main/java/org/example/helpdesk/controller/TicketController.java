@@ -4,6 +4,7 @@ import org.example.helpdesk.entity.Ticket;
 import org.example.helpdesk.enums.TicketStatus;
 import org.example.helpdesk.service.TicketService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -18,8 +19,12 @@ public class TicketController {
     }
 
     @GetMapping
-    public List<Ticket> findAll() {
-        return ticketService.findAll();
+    public List<Ticket> findAll(Authentication authentication) {
+        if (isAdmin(authentication)) {
+            return ticketService.findAll();
+        }
+
+        return ticketService.findAllByUsername(authentication.getName());
     }
 
     @GetMapping("/{id}")
@@ -50,5 +55,11 @@ public class TicketController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         ticketService.delete(id);
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities()
+                .stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 }
